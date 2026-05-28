@@ -1,0 +1,19 @@
+{
+  "name": "novatools/novatools",
+  "description": "A collection of tools for WordPress.",
+  "autoload": {
+    "psr-4": {
+      "NovaTools\\": "includes/",
+      "NovaTools\\Database\\": "database/",
+      "NovaTools\\Libs\\": "libs/"
+    },
+    "files": [
+      "libs/assets.php",
+      "libs/db.php",
+      "includes/functions.php"
+    ]
+  },
+  "require": {
+    "prappo/wp-eloquent": "^3.0"
+  }
+}

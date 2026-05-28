@@ -1,0 +1,15 @@
+{
+    "plugin_name": "NovaTools",
+    "plugin_description": "A collection of tools for WordPress.",
+    "plugin_version": "1.0.0",
+    "plugin_file_name": "novatools.php",
+    "author_name": "",
+    "author_uri": "",
+    "text_domain": "novatools",
+    "domain_path": "/languages",
+    "main_class_name": "NovaTools",
+    "main_function_name": "novatools_init",
+    "namespace": "NovaTools",
+    "plugin_prefix": "novatools",
+    "constant_prefix": "NOVATOOLS"
+}
