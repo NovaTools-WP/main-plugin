@@ -4,7 +4,7 @@ import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
 import { ThemeProvider } from "@/components/theme-provider"
-const el = document.getElementById("myplugin");
+const el = document.getElementById("novatools");
 
 if (el) {
   ReactDOM.createRoot(el).render(
