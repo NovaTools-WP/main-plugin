@@ -1,9 +1,9 @@
 {
-    "plugin_name": "NovaTools",
-    "plugin_description": "A collection of tools for WordPress.",
+    "plugin_name": "NovaTools - The Ultimate React-based Addon Framework",
+    "plugin_description": "Empower your WordPress experience with NovaTools, the robust, React-powered foundational framework designed to seamlessly host, manage, and display dynamic addon plugins in a unified interface.",
     "plugin_version": "1.0.0",
     "plugin_file_name": "novatools.php",
-    "author_name": "",
+    "author_name": "Siim Liimand",
     "author_uri": "",
     "text_domain": "novatools",
     "domain_path": "/languages",

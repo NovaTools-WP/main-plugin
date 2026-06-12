@@ -40,8 +40,8 @@ class Menu {
 	public function menu() {
 
 		add_menu_page(
-			__( 'NovaTools', 'novatools' ),
-			__( 'NovaTools', 'novatools' ),
+			esc_html__( 'NovaTools', 'novatools' ),
+			esc_html__( 'NovaTools', 'novatools' ),
 			'manage_options',
 			$this->parent_slug,
 			array( $this, 'admin_page' ),
@@ -53,8 +53,8 @@ class Menu {
 		$submenu_pages = array(
 			array(
 				'parent_slug' => $this->parent_slug,
-				'page_title'  => __( 'NovaTools', 'novatools' ),
-				'menu_title'  => __( 'NovaTools', 'novatools' ),
+				'page_title'  => esc_html__( 'NovaTools', 'novatools' ),
+				'menu_title'  => esc_html__( 'NovaTools', 'novatools' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => $this->parent_slug,
 				'function'    => array( $this, 'admin_page' ),
@@ -84,7 +84,7 @@ class Menu {
 	 */
 	public function admin_page() {
 		?>
-		<div id="myplugin" class="myplugin-app"></div>
+		<div id="novatools" class="novatools-app"></div>
 		<?php
 	}
 }
