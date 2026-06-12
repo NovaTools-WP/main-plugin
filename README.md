@@ -1,100 +1,95 @@
-# WordPress Plugin Boilerplate
-Create your WordPress plugin in weeks, not months. Rapidly prototype and deliver your plugin with confidence!
-This boilerplate has a built-in marketing site and documentation setup that you can use to showcase your plugin.
-## Preview
+# NovaTools
 
-<a href='https://prappo.github.io/wordpress-plugin-boilerplate/preview' target="_blank"><img alt='Wordpress' src='https://img.shields.io/badge/Live_Preview-100000?style=for-the-badge&logo=Wordpress&logoColor=white&labelColor=21759B&color=21759B'/></a>
+NovaTools is a foundational host plugin designed to power a dynamic, React-based ecosystem of tools for WordPress. Its main purpose is to serve as the core framework and host environment for various addon plugins.
 
-## Screenshots
+NovaTools provides a seamless administrative and frontend interface using React, allowing developers to easily register, inject, and display their addon components within a unified application layout.
 
-<table>
- 
-  <tr>
-  <td><img src="documentation/public/artworks/images/chart.png" /></td>
-  <td><img src="documentation/public/artworks/images/dashboard-light.png" /></td>
-  </tr>
-  <tr>
-    <td><img src="documentation/public/artworks/images/inbox-light.png" /></td>
-    <td><img src="documentation/public/artworks/images/settings-light.png" /></td>
-    
-  </tr>
-  
-</table>
+## 🌟 Ecosystem
 
+NovaTools currently powers the following addons:
 
-## Install using CLI tool
+- [NovaTools SEO](https://github.com/NovaTools-WP/seo-plugin)
+- [NovaTools Polyglot](https://github.com/NovaTools-WP/polyglot-plugin)
 
-Install [PlugKit](https://github.com/prappo/plugkit). You can find the installation instructions from here [https://github.com/prappo/plugkit](https://github.com/prappo/plugkit)
+## 🛠️ For Addon Developers
 
-To create a new WordPress plugin boilerplate.
+NovaTools is designed from the ground up to be extensible. Developing an addon requires two main steps: registering the route in PHP and registering the component in React.
 
-```bash
-plugkit create my-plugin
-```
-https://github.com/user-attachments/assets/39ab761e-ca40-4613-a88c-40620a1b2523
+### 1. Registering the Addon in PHP
 
-Or you can follow the manual installation process.
-<details>
-<summary><strong>Manual installation</strong></summary>
+Use the `novatools_admin_routes` filter to tell NovaTools about your addon. This ensures that NovaTools will enqueue your addon's scripts when the NovaTools interface loads.
 
-## Get Started
-The plugin consists of two main components: the frontend, built with React, and the backend, which communicates via an API.
-
-To get started, you need to clone the repository and install the dependencies. Then you can rename the plugin and start development. It's that simple!
-
-<img width="100%" src="documentation/public/artworks/plugin-dev-process.svg" />
-
-## Clone the repository
-```bash
-git clone https://github.com/prappo/wordpress-plugin-boilerplate.git
+```php
+add_filter( 'novatools_admin_routes', function( $routes ) {
+    $routes[] = array(
+        'name'         => 'SEO Dashboard',
+        'href'         => '#/seo',
+        'icon'         => 'ChartBarIcon', // Uses Heroicons
+        'current'      => false,
+        'addonId'      => 'novatools_seo',
+        'component'    => 'Dashboard',
+        'scriptHandle' => 'novatools-seo-admin-script', // The handle you used to enqueue your JS
+    );
+    return $routes;
+});
 ```
 
-## Install dependencies
+### 2. Registering the Component in React
+
+In your addon's JavaScript (React) code, use the global registry to inject your component. NovaTools exposes `window.NovaToolsAddons` to handle this.
+
+```javascript
+// In your addon's source code
+function DashboardComponent() {
+    return (
+        <div>
+            <h1>SEO Dashboard</h1>
+            <p>Welcome to the NovaTools SEO addon!</p>
+        </div>
+    );
+}
+
+// Ensure the registry exists (or import if you are within the NovaTools build process)
+window.NovaToolsAddons = window.NovaToolsAddons || {};
+
+// Register your component
+if (!window.NovaToolsAddons['novatools_seo']) {
+    window.NovaToolsAddons['novatools_seo'] = {};
+}
+window.NovaToolsAddons['novatools_seo']['Dashboard'] = DashboardComponent;
+```
+
+When NovaTools loads, it reads the registered routes from PHP, looks up the corresponding `addonId` and `component` name in `window.NovaToolsAddons`, and dynamically renders your React component inside its main layout!
+
+---
+
+## 💻 Internal Development Guide
+
+If you are contributing to the core NovaTools plugin, the following sections describe the internal setup.
+
+### Get Started
+
+The plugin consists of two main components: the frontend/admin, built with React, and the backend, which communicates via an API.
+
 ```bash
+git clone https://github.com/NovaTools-WP/novatools.git
 npm install
 composer install
 ```
-## Plugin renaming
 
-You can easly rename the plugin by changing data in `plugin-config.json` file.
+### Add Shadcn UI
 
-```json
-{
-    "plugin_name":"WordPress Plugin Boilerplate",
-    "plugin_description":"A boilerplate for WordPress plugins.",
-    "plugin_version":"1.0.0",
-    "plugin_file_name":"wordpress-plugin-boilerplate.php",
-    "author_name":"Prappo",
-    "author_uri":"https://prappo.github.io",
-    "text_domain":"wordpress-plugin-boilerplate",
-    "domain_path":"/languages",
-    "main_class_name":"WordPressPluginBoilerplate",
-    "main_function_name":"wordpress_plugin_boilerplate_init",
-    "namespace":"WordPressPluginBoilerplate",
-    "plugin_prefix":"wpb",
-    "constant_prefix":"WPB"
-}
-```
-
-Then run the following command to rename the plugin
-
-```bash
-npm run rename
-```
-</details>
-
-## Add Shadcn UI
+We use Shadcn UI for our React components.
 
 ```bash
 npx shadcn@latest add accordion
 ```
-It will install the component in `src/components` folder.
+It will install the component in the `src/components` folder.
 
-
-## Structure
+### Structure
 
 <details open>
-  <summary><strong>📂 wordpress-plugin-boilerplate</strong></summary>
+  <summary><strong>📂 novatools</strong></summary>
   <ul>
     <li>
     <details>
@@ -114,19 +109,11 @@ It will install the component in `src/components` folder.
         <li>
         <details>
         <summary><strong>📂 Migrations</strong></summary>
-        <ul>
-          <li><summary><strong>📄 create_posts_table.php</strong></summary></li>
-          <li><summary><strong>📄 create_users_table.php</strong></summary></li>
-        </ul>
         </details>
         </li>
         <li>
         <details>
         <summary><strong>📂 Seeders</strong></summary>
-        <ul>
-          <li><summary><strong>📄 PostSeeder.php</strong></summary></li>
-          <li><summary><strong>📄 UserSeeder.php</strong></summary></li>
-        </ul>
         </details>
         </li>
       </ul>
@@ -164,7 +151,7 @@ It will install the component in `src/components` folder.
     <li><summary><strong>📂 vendor</strong></summary></li>
     <li><summary><strong> 📄 plugin.php</strong></summary></li>
     <li><summary><strong> 📄 uninstall.php</strong></summary></li>
-    <li><summary><strong> 📄 wordpress-plugin-boilerplate.php</strong></summary></li>
+    <li><summary><strong> 📄 novatools.php</strong></summary></li>
   </ul>
 </details>
 
@@ -190,26 +177,26 @@ Route::prefix( $prefix, function( Route $route )
 #### API Example
 ```php
 // Get All posts
-$route->get( '/posts/get', '\WordPressPluginBoilerplate\Controllers\Posts\Actions@get_all_posts' );
+$route->get( '/posts/get', '\NovaTools\Controllers\Posts\Actions@get_all_posts' );
 
 // Get Single Posts
-$route->get( '/posts/get/{id}', '\WordPressPluginBoilerplate\Controllers\Posts\Actions@get_post' );
+$route->get( '/posts/get/{id}', '\NovaTools\Controllers\Posts\Actions@get_post' );
 ```
 
-## ORM ( Object Relational Mapping )
+### ORM ( Object Relational Mapping )
 
 If you are familiar with Laravel, you will find this ORM very familiar. It is a simple and easy-to-use ORM for WordPress.
 
 You can find the ORM documentation [here](https://github.com/prappo/wp-eloquent)
 
-Create your model in `includes/Models` folder.
+Create your model in the `includes/Models` folder.
 
 Example: `includes/Models/Posts.php`
 
 ```php
 <?php
 
-namespace WordPressPluginBoilerplate\Models;
+namespace NovaTools\Models;
 
 use Prappo\WpEloquent\Database\Eloquent\Model;
 
@@ -237,56 +224,18 @@ You can access all your posts like this:
 $posts = Posts::all();
 ```
 
-You can also create a new post like this:
+### Passing data from backend to frontend
 
-```php
-$post = Posts::create( array( 'post_title' => 'Hello World', 'post_content' => 'This is a test post' ) );
+Pass your data to the array in the Asset file (e.g. `includes/Assets/Frontend.php` or `includes/Assets/Admin.php`).
+
+And access data in React like this:
+
+```javascript
+// Usually available on window.novaTools (based on your Asset enqueue handle)
+const myData = window.novaTools;
 ```
 
-You can also update a post like this:
-
-```php
-$post = Posts::find( 1 );
-$post->post_title = 'Hello World';
-$post->save();
-```
-
-You can also delete a post like this:
-
-```php
-$post = Posts::find( 1 );
-$post->delete();
-```
-
-You can also use the `where` method to filter your posts.
-
-```php
-$posts = Posts::where( 'post_title', 'like', '%hello%' )->get();
-```
-
-You can also use the `orderBy` method to sort your posts.
-
-```php
-$posts = Posts::orderBy( 'post_title', 'desc' )->get();
-```
-
-## Passing data from backend to frontend
-
-Just pass your data to the array in the Asset file.
-
-For example: For admin:
-
-https://github.com/prappo/wordpress-plugin-boilerplate/blob/8d982b63f50beb1dffd43c29bff894814b5e7945/includes/Assets/Frontend.php#L104-L110
-
-And access data on react like this 
-
-https://github.com/prappo/wordpress-plugin-boilerplate/blob/8d982b63f50beb1dffd43c29bff894814b5e7945/src/frontend/components/application-layout/LayoutOne.jsx#L58
-
-Remember the object `wordpressPluginBoilerplateFrontend` name can be defined here 
-
-https://github.com/prappo/wordpress-plugin-boilerplate/blob/8d982b63f50beb1dffd43c29bff894814b5e7945/includes/Assets/Frontend.php#L30
-
-## Shortcode
+### Shortcode
 
 You can create a shortcode by using the `Shortcode` class.
 
@@ -313,84 +262,41 @@ Shortcode::add()
     });
 ```
 
-The php render file should be in the `views/shortcode` folder.
+### Development Scripts
 
-For example: `views/shortcode/myshortcode.php`
-
-```php
-<div id="<?= isset($id) ? esc_attr($id) : '' ?>" class="shortcode-box">
-    <h3><?= isset($name) ? esc_html($name) : 'Default Title' ?></h3>
-    <p><?= isset($shortcode_content) ? esc_html($shortcode_content) : '' ?></p>
-</div>
-```
-
-### Example Usage in WordPress editor
-
-```
-
-[myshortcode id="box1" name="Example Shortcode"]
-This is the content inside the shortcode.
-[/myshortcode]
-
-[customshortcode title="Dynamic Title" class="highlight"]
-Some highlighted content.
-[/customshortcode]
-```
-
-## Development
+The available scripts in `package.json` are:
 
 ```bash
-npm run dev
-```
-If you want to run only frontend or admin you can use the following commands:
-
-```bash
-npm run dev:frontend
-npm run dev:admin
+npm run dev           # Run all (frontend and admin)
+npm run dev:frontend  # Run specifically for frontend
+npm run dev:admin     # Run specifically for admin
+npm run dev:server    # Run with server
 ```
 
-## Development with server
-
-```bash
-npm run dev:server
-```
-
-## Build
+### Build
 
 ```bash
 npm run build
 ```
-## Developing block
+
+### Developing blocks
 
 ```bash
 npm run block:start
-```
-
-## Build block
-
-```bash
 npm run block:build
 ```
 
-## Release
+### Release
 
 ```bash
 npm run release
 ```
 
-It will create a relase plugin in `release` folder
+It will create a release plugin in the `release` folder.
 
-## Trouble shooting
+### Troubleshooting
 
-If you are facing any issue with the development server, you can try the following steps:
+If you are facing any issues with the development server:
 
-1. If you are using Local WP you might see dev server is not working because of SSL certificate issue or domain mismatch.You can fix this by chaning your `Router mode` to `localhost`.
-
-2. Sometimes you might see on the first run of `npm run dev` you might see nothing is happening. You can try to run `npm run dev` again.
-
-
-## Made with WordPress Plugin Boilerplate
-[WordPress AI Assistant](https://github.com/prappo/wordpress-ai-assistant)
-
-<img src="https://github.com/prappo/wordpress-ai-assistant/blob/main/docs/screenshots/wordpress-assistant-chat.png" />
-
+1. If you are using Local WP, you might see the dev server is not working because of an SSL certificate issue or domain mismatch. You can fix this by changing your `Router mode` to `localhost`.
+2. Sometimes you might see on the first run of the dev server that nothing is happening. You can try to run it again.
