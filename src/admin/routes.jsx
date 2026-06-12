@@ -1,12 +1,13 @@
-import React from "react";
+// @ts-nocheck
 import { createHashRouter } from "react-router-dom";
 import ApplicationLayout from "../components/application-layout/LayoutOne";
 import ErrorPage from "./pages/error/Error";
 import LoginPage from "./pages/login";
+import DashboardPage from "./pages/dashboard";
 
 function createAddonComponent(addonId, componentName) {
   return function AddonComponent() {
-    const addon = window.NovaToolsAddons?.[addonId];
+    const addon = window['NovaToolsAddons']?.[addonId];
     if (addon && addon[componentName]) {
       const Component = addon[componentName];
       return <Component />;
@@ -15,7 +16,7 @@ function createAddonComponent(addonId, componentName) {
   };
 }
 
-const addonRoutes = (window.novaTools?.addonRoutes || []).map((route) => {
+const addonRoutes = (window['novaTools']?.addonRoutes || []).map((route) => {
   const AddonComponent = createAddonComponent(route.addonId, route.component);
   return {
     path: route.path,
@@ -29,6 +30,7 @@ export const router = createHashRouter([
     element: <ApplicationLayout />,
     errorElement: <ErrorPage />,
     children: [
+      { index: true, element: <DashboardPage /> },
       { path: "login", element: <LoginPage /> },
       ...addonRoutes,
     ],

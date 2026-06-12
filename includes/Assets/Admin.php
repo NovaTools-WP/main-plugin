@@ -109,7 +109,91 @@ class Admin {
 			'apiUrl'       => rest_url(),
 			'userInfo'     => $this->get_user_data(),
 			'addonRoutes'  => $this->get_registered_routes(),
+			'addons'       => $this->get_addons_data(),
 		);
+	}
+
+	/**
+	 * Get addons status and details.
+	 *
+	 * @return array Array of addons.
+	 */
+	public function get_addons_data() {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$addons = array(
+			array(
+				'id'          => 'novatools-polyglot',
+				'name'        => 'NovaTools Polyglot',
+				'path'        => 'novatools-polyglot/novatools-polyglot.php',
+				'description' => esc_html__( 'Translate pages, posts, custom post types, menus, and theme strings with an intuitive interface. Features modern UI, WPML translation compatibility shim, and robust WP-CLI command integration.', 'novatools' ),
+				'icon'        => 'Globe',
+				'version'     => '1.0.0',
+				'settingsPath'=> '/polyglot',
+				'features'    => array(
+					esc_html__( 'Multi-language management', 'novatools' ),
+					esc_html__( 'Translation workflow for posts and pages', 'novatools' ),
+					esc_html__( 'String translation support', 'novatools' ),
+					esc_html__( 'WPML translation compatibility API', 'novatools' ),
+					esc_html__( 'WP-CLI automation commands', 'novatools' ),
+				),
+			),
+			array(
+				'id'          => 'novatools-seo',
+				'name'        => 'NovaTools SEO',
+				'path'        => 'novatools-seo/novatools-seo.php',
+				'description' => esc_html__( 'Boost your search rankings with ease. Build XML sitemaps, manage redirects, control social media sharing, optimize local and WooCommerce SEO, and use geo-targeting utilities.', 'novatools' ),
+				'icon'        => 'Search',
+				'version'     => '1.0.1',
+				'settingsPath'=> '/seo',
+				'features'    => array(
+					esc_html__( 'XML Sitemap generation', 'novatools' ),
+					esc_html__( 'Advanced redirect management', 'novatools' ),
+					esc_html__( 'Social media meta tags control', 'novatools' ),
+					esc_html__( 'Local SEO optimization', 'novatools' ),
+					esc_html__( 'WooCommerce product SEO features', 'novatools' ),
+					esc_html__( 'Geo-targeting capabilities', 'novatools' ),
+				),
+			),
+		);
+
+		$result = array();
+		foreach ( $addons as $addon ) {
+			$path = $addon['path'];
+			$installed = file_exists( WP_PLUGIN_DIR . '/' . $path );
+			$active = $installed && is_plugin_active( $path );
+
+			$status = 'not_installed';
+			if ( $active ) {
+				$status = 'active';
+			} elseif ( $installed ) {
+				$status = 'inactive';
+			}
+
+			// Read version dynamically if installed
+			$version = $addon['version'];
+			if ( $installed ) {
+				if ( ! function_exists( 'get_plugin_data' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
+				$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $path );
+				if ( ! empty( $plugin_data['Version'] ) ) {
+					$version = $plugin_data['Version'];
+				}
+			}
+
+			$addon['status'] = $status;
+			$addon['version'] = $version;
+			$addon['activateUrl'] = $installed ? wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . urlencode( $path ) . '&_wp_http_referer=' . urlencode( admin_url( 'admin.php?page=novatools' ) ) ), 'activate-plugin_' . $path ) : '';
+			$addon['deactivateUrl'] = $active ? wp_nonce_url( admin_url( 'plugins.php?action=deactivate&plugin=' . urlencode( $path ) . '&_wp_http_referer=' . urlencode( admin_url( 'admin.php?page=novatools' ) ) ), 'deactivate-plugin_' . $path ) : '';
+			$addon['installUrl'] = admin_url( 'plugin-install.php' );
+
+			$result[] = $addon;
+		}
+
+		return $result;
 	}
 
 	/**
