@@ -49,51 +49,19 @@ class Menu {
 			3
 		);
 
-		$plugin_url = admin_url( '/admin.php?page=' . $this->parent_slug );
-
-		$current_page = get_admin_page_parent();
-
-		if ( $current_page === $this->parent_slug ) {
-			$plugin_url = '';
-		}
-
+		// Default submenu: parent page only (no core tabs).
 		$submenu_pages = array(
 			array(
 				'parent_slug' => $this->parent_slug,
-				'page_title'  => __( 'Dashboard', 'novatools' ),
-				'menu_title'  => __( 'Dashboard', 'novatools' ),
+				'page_title'  => __( 'NovaTools', 'novatools' ),
+				'menu_title'  => __( 'NovaTools', 'novatools' ),
 				'capability'  => 'manage_options',
 				'menu_slug'   => $this->parent_slug,
-				'function'    => array( $this, 'admin_page' ), // Uses the same callback function as parent menu.
-			),
-			array(
-				'parent_slug' => $this->parent_slug,
-				'page_title'  => __( 'Inbox', 'novatools' ),
-				'menu_title'  => __( 'Inbox', 'novatools' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => $plugin_url . '/#/inbox',
-				'function'    => null, // Uses the same callback function as parent menu.
-			),
-
-			array(
-				'parent_slug' => $this->parent_slug,
-				'page_title'  => __( 'Chart', 'novatools' ),
-				'menu_title'  => __( 'Chart', 'novatools' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => $plugin_url . '/#/charts',
-				'function'    => null, // Uses the same callback function as parent menu.
-			),
-
-			array(
-				'parent_slug' => $this->parent_slug,
-				'page_title'  => __( 'Settings', 'novatools' ),
-				'menu_title'  => __( 'Settings', 'novatools' ),
-				'capability'  => 'manage_options',
-				'menu_slug'   => $plugin_url . '/#/settings',
-				'function'    => null, // Uses the same callback function as parent menu.
+				'function'    => array( $this, 'admin_page' ),
 			),
 		);
 
+		// Add-on plugins register their submenu pages via this filter.
 		$plugin_submenu_pages = apply_filters( 'novatools_submenu_pages', $submenu_pages );
 
 		foreach ( $plugin_submenu_pages as $submenu ) {

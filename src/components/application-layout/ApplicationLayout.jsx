@@ -73,12 +73,53 @@ const ApplicationLayout = () => {
   const [currentHoverMenu, setCurrentHoverMenu] = useState(navigation[0].href);
 
   useEffect(() => {
-    if (pageTitle) {
-      navigate(pageTitle);
-    } else {
+    if ((!location.pathname || location.pathname === "/") && navigation.length > 0) {
       navigate(navigation[0].href);
     }
   }, []);
+
+  useEffect(() => {
+    // Sync WordPress admin menu active class based on the current hash route
+    const adminMenu = document.getElementById("adminmenu");
+    if (!adminMenu) return;
+
+    const currentHash = window.location.hash.split("?")[0]; // e.g. #/polyglot/languages
+    const hashBase = currentHash.split("/").slice(0, 2).join("/"); // e.g. #/polyglot or #/seo
+
+    const submenuLinks = adminMenu.querySelectorAll(".wp-submenu a");
+    submenuLinks.forEach((link) => {
+      const href = link.getAttribute("href") || "";
+      const parentLi = link.parentElement;
+      if (!parentLi) return;
+
+      // Check if the link's href matches the current route hash
+      const hasHash = href.includes("#/");
+      if (hasHash) {
+        const linkHash = href.substring(href.indexOf("#/")); // e.g. #/polyglot
+        const linkHashBase = linkHash.split("?")[0];
+        if (hashBase === linkHashBase) {
+          parentLi.classList.add("current");
+        } else {
+          parentLi.classList.remove("current");
+        }
+      } else {
+        // If it's the core NovaTools link (no hash) e.g. admin.php?page=novatools
+        // it should only be active if the current hash is empty or just #/
+        if (!currentHash || currentHash === "#/" || currentHash === "#") {
+          if (href.endsWith("page=novatools") || href.includes("page=novatools&") || href.includes("page=novatools#")) {
+            parentLi.classList.add("current");
+          } else {
+            parentLi.classList.remove("current");
+          }
+        } else {
+          // If we are on an addon subpage (has hash), the base (non-hash) link should NOT be active
+          if (href.endsWith("page=novatools") || href.includes("page=novatools&")) {
+            parentLi.classList.remove("current");
+          }
+        }
+      }
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     if (pageTitle) {

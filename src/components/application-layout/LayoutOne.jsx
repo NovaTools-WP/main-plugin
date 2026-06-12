@@ -1,11 +1,6 @@
 import {
     CircleUser,
-    Home,
-    Mail,
     Menu,
-    SlidersHorizontal,
-    Package2,
-    BarChart,
     CircleDot
 } from "lucide-react"
 import * as LucideIcons from "lucide-react"
@@ -20,7 +15,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../Icons/Logo";
@@ -30,33 +24,7 @@ function getIcon(iconName) {
     return LucideIcons[iconName] || CircleDot;
 }
 
-const coreNavigation = [
-    {
-        name: "Dashboard",
-        href: "dashboard",
-        icon: Home,
-        current: true,
-    },
-    {
-        name: "Inbox",
-        href: "inbox",
-        icon: Mail,
-        current: false,
-    },
-    {
-        name: "Settings",
-        href: "settings",
-        icon: SlidersHorizontal,
-        current: false,
-    },
-    {
-        name: "Charts",
-        href: "charts",
-        icon: BarChart,
-        current: false,
-    }
-];
-
+// Navigation comes only from add-on plugins (e.g. NovaTools SEO).
 const addonNavItems = (window.novaTools?.addonRoutes || [])
     .filter(route => route.navLabel)
     .map(route => ({
@@ -66,7 +34,7 @@ const addonNavItems = (window.novaTools?.addonRoutes || [])
         current: false,
     }));
 
-const navigation = [...coreNavigation, ...addonNavItems];
+const navigation = [...addonNavItems];
 
 export default function LayoutOne() {
     let showApplicationLayout = !novaTools.isAdmin;
@@ -77,21 +45,62 @@ export default function LayoutOne() {
         showApplicationLayout = false;
     }
     useEffect(() => {
-        if (pageTitle) {
-          navigate(pageTitle);
-        } else {
-          navigate(navigation[0].href);
+        if ((!location.pathname || location.pathname === "/") && navigation.length > 0) {
+            navigate(navigation[0].href);
         }
-      }, []);
+    }, []);
+
+    useEffect(() => {
+        // Sync WordPress admin menu active class based on the current hash route
+        const adminMenu = document.getElementById("adminmenu");
+        if (!adminMenu) return;
+
+        const currentHash = window.location.hash.split("?")[0]; // e.g. #/polyglot/languages
+        const hashBase = currentHash.split("/").slice(0, 2).join("/"); // e.g. #/polyglot or #/seo
+
+        const submenuLinks = adminMenu.querySelectorAll(".wp-submenu a");
+        submenuLinks.forEach((link) => {
+            const href = link.getAttribute("href") || "";
+            const parentLi = link.parentElement;
+            if (!parentLi) return;
+
+            // Check if the link's href matches the current route hash
+            const hasHash = href.includes("#/");
+            if (hasHash) {
+                const linkHash = href.substring(href.indexOf("#/")); // e.g. #/polyglot
+                const linkHashBase = linkHash.split("?")[0];
+                if (hashBase === linkHashBase) {
+                    parentLi.classList.add("current");
+                } else {
+                    parentLi.classList.remove("current");
+                }
+            } else {
+                // If it's the core NovaTools link (no hash) e.g. admin.php?page=novatools
+                // it should only be active if the current hash is empty or just #/
+                if (!currentHash || currentHash === "#/" || currentHash === "#") {
+                    if (href.endsWith("page=novatools") || href.includes("page=novatools&") || href.includes("page=novatools#")) {
+                        parentLi.classList.add("current");
+                    } else {
+                        parentLi.classList.remove("current");
+                    }
+                } else {
+                    // If we are on an addon subpage (has hash), the base (non-hash) link should NOT be active
+                    if (href.endsWith("page=novatools") || href.includes("page=novatools&")) {
+                        parentLi.classList.remove("current");
+                    }
+                }
+            }
+        });
+    }, [location.pathname]);
 
     return (
         <div className={`grid min-h-screen w-full ${showApplicationLayout ? 'md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]' : ''}`}>
             {showApplicationLayout && <div className="hidden border-r bg-muted/40 md:block">
                 <div className="flex h-full max-h-screen flex-col gap-2">
                     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                        <a href="#/dashboard" className="flex items-center gap-2 font-semibold">
+                        <a href={navigation.length > 0 ? `#/${navigation[0].href}` : '#/'} className="flex items-center gap-2 font-semibold">
                             <Logo />
-                            <span className="">Plugin Name</span>
+                            <span className="">NovaTools</span>
                         </a>
 
                     </div>
@@ -138,13 +147,6 @@ export default function LayoutOne() {
                         </SheetTrigger>
                         <SheetContent side="left" className="flex flex-col">
                             <nav className="grid gap-2 text-lg font-medium">
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-2 text-lg font-semibold"
-                                >
-                                    <Package2 className="h-6 w-6" />
-                                    <span className="sr-only">Plugin Name</span>
-                                </a>
                                 {navigation.map((item,index) => {
                                     return <NavLink
                                         to={item.href}
