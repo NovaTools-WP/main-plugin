@@ -28,4 +28,6 @@ Route::prefix(
 		// Allow hooks to add more custom API routes.
 		do_action( 'novatools_api', $route );
 	}
-);
+)->auth( function() {
+	return current_user_can( 'manage_options' );
+});

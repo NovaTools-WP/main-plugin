@@ -70,11 +70,12 @@ class Actions {
 		$account             = new Accounts();
 		$account->host       = self::GMAIL_SMPT_HOST;
 		$account->port       = self::GMAIL_PORT;
-		$account->first_name = $request->get_param( 'firstName' );
-		$account->last_name  = $request->get_param( 'lastName' );
-		$account->email      = $request->get_param( 'email' );
-		$account->password   = $request->get_param( 'appPassword' );
+		$account->first_name = sanitize_text_field( wp_unslash( $request->get_param( 'firstName' ) ) );
+		$account->last_name  = sanitize_text_field( wp_unslash( $request->get_param( 'lastName' ) ) );
+		$account->email      = sanitize_email( wp_unslash( $request->get_param( 'email' ) ) );
+		$account->password   = sanitize_text_field( wp_unslash( $request->get_param( 'appPassword' ) ) );
 		$account->save();
+		return true;
 	}
 
 	/**
@@ -93,7 +94,7 @@ class Actions {
 	 * @return array The response message.
 	 */
 	public function delete( \WP_REST_Request $request ) {
-		$id = $request->get_param( 'id' ); // Account ID requested to delete.
+		$id = absint( $request->get_param( 'id' ) ); // Account ID requested to delete.
 		try {
 			Accounts::where( 'id', $id )->delete();
 			return Messages::success_account_deleted();
@@ -109,15 +110,15 @@ class Actions {
 	 * @return array The response message.
 	 */
 	public function update( \WP_REST_Request $request ) {
-		$id = $request->get_param( 'id' );
+		$id = absint( $request->get_param( 'id' ) );
 
 		try {
 			Accounts::where( 'id', $id )->update(
 				array(
-					'first_name' => $request->get_param( 'firstName' ),
-					'last_name'  => $request->get_param( 'lastName' ),
-					'email'      => $request->get_param( 'email' ),
-					'password'   => $request->get_param( 'appPassword' ),
+					'first_name' => sanitize_text_field( wp_unslash( $request->get_param( 'firstName' ) ) ),
+					'last_name'  => sanitize_text_field( wp_unslash( $request->get_param( 'lastName' ) ) ),
+					'email'      => sanitize_email( wp_unslash( $request->get_param( 'email' ) ) ),
+					'password'   => sanitize_text_field( wp_unslash( $request->get_param( 'appPassword' ) ) ),
 				)
 			);
 			return Messages::success_account_update();
