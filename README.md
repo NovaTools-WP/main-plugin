@@ -72,9 +72,11 @@ If you are contributing to the core NovaTools plugin, the following sections des
 The plugin consists of two main components: the frontend/admin, built with React, and the backend, which communicates via an API.
 
 ```bash
-git clone https://github.com/NovaTools-WP/novatools.git
-npm install
+cd wp-content/plugins
+git clone git@github.com:NovaTools-WP/main-plugin.git novatools
+cd novatools
 composer install
+npm install
 ```
 
 ### Add Shadcn UI

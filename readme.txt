@@ -1,5 +1,5 @@
 === NovaTools - The Ultimate React-based Addon Framework ===
-Contributors: siimliimand
+Contributors: NovaTools
 Tags: developer tools, react, framework, addons
 Requires at least: 5.9
 Tested up to: 6.6

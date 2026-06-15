@@ -2,8 +2,8 @@
 /**
  * Plugin Name: NovaTools - The Ultimate React-based Addon Framework
  * Description: Empower your WordPress experience with NovaTools, the robust, React-powered foundational framework designed to seamlessly host, manage, and display dynamic addon plugins in a unified interface.
- * Author: Siim Liimand
- * Author URI: 
+ * Author: NovaTools
+ * Author URI: https://novatools.ww0.dev
  * License: GPLv2
  * Version: 1.0.0
  * Text Domain: novatools
